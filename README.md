@@ -111,3 +111,40 @@ goose -dir migrations mysql "$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$DB_PORT)/$DB_NA
 - コンテナの環境変数：
   - `GOOSE_DRIVER=mysql`
   - `GOOSE_DBSTRING=goose:goose@tcp(mysql:3306)/testdb`
+
+## Appendix
+### 途中で失敗する場合ロールバックしたい
+- 単一のクエリ -> ロールバックされる
+- 複数のクエリ -> 成功したところまではそのままになる
+
+以下のようなクエリを実行した場合、成功したテーブル作成の部分はロールバックされない
+=> ファイルを分割する戦略をとったほうが良さそう
+
+```sql
+-- +goose Up
+-- +goose StatementBegin
+
+-- まず成功する処理：ユーザー設定テーブルを作成
+CREATE TABLE user_settings (
+    user_id INT PRIMARY KEY,
+    theme VARCHAR(50) DEFAULT 'default',
+    notifications_enabled BOOLEAN DEFAULT TRUE
+);
+
+-- わざと失敗させる処理：存在しないカラムを参照
+INSERT INTO user_settings (user_id, theme)
+SELECT id, non_existent_column
+FROM users;
+
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+DROP TABLE IF EXISTS user_settings;
+-- +goose StatementEnd
+```
+
+試したこと
+- `BEGIN - COMMIT`, `START TRANSACTION - COMMIT`でトランザクションを発生させる -> 失敗
+- `+goose NO TRANSACTION`をつけ、自分でトランザクションを発生させる -> 失敗
+- goのマイグレーションを作成する -> カスタムバイナリ（マイグレーションを実行するためのコード）を自分で作成する必要がある
