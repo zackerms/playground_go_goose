@@ -1,7 +1,7 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
