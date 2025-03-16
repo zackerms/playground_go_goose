@@ -97,6 +97,9 @@ DB_HOST=localhost \
 DB_PORT=3906 \
 DB_NAME=testdb \
 goose -dir migrations mysql "$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$DB_PORT)/$DB_NAME?parseTime=true&loc=Asia%2FTokyo&multiStatements=True" up
+
+# 認証が必要な場合
+goose -dir migrations -certfile=/etc/ssl/certs/ca-certificates.crt mysql "$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$DB_PORT)/$DB_NAME?parseTime=true&loc=Asia%2FTokyo&multiStatements=True" up
 ```
 
 ## 注意事項
