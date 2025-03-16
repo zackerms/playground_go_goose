@@ -88,6 +88,8 @@ DROP TABLE example;
 3. `goose up`コマンドを実行してマイグレーションを適用
 
 ## 外部のDBサーバに対してマイグレーションを実行
+- multiStatements: `+goose StatementBegin`などを利用する場合に必要
+
 ```shell
 DB_USER=goose \
 DB_PASSWORD=goose \
